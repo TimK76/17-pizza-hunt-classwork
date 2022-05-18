@@ -11,11 +11,29 @@ const PizzaSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    sie: {
+    size: {
         type: String,
         default: 'Large'
     },
-    toppings: []
+    toppings: [],
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ]
+},
+{
+    toJSON: {
+        virtuals: true,
+    },
+    id: false
+}
+);
+
+// get total cout of comments and replies on retrieval
+PizzaSchema.virtual('commentCount').get(function() {
+    return this.comments.legth;
 });
 
 // create the Pizza model using the PizzaSchema
