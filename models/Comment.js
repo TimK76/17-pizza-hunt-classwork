@@ -1,55 +1,61 @@
-const { Schema, model, Types } = require('mongoose');
-const dateFormat = require('../utils/dateFormat');
+const { Schema, model, Types } = require("mongoose");
+const dateFormat = require("../utils/dateFormat");
 
 const ReplySchema = new Schema(
-    { // Set custom id to avoid confusion with parent comment _id
-        replyId: {
-            type: Schema.Types.ObjectId()
-        },
-        replyBody: {
-            type: String 
-        },
-        writtenBy: {
-            type: String
-        },
-        createdAt: {
-            type: Date,
-            default: Date.now,
-            get: createdAtVal => dateFormat(createdAtVal)
-        }
+  {
+    // set custom id to avoid confusion with parent comment _id
+    replyId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
-    {
-        toJSON: {
-            getters: true
-        }
-    }
+    replyBody: {
+      type: String,
+    },
+    writtenBy: {
+      type: String,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: (createdAtVal) => dateFormat(createdAtVal),
+    },
+  },
+  {
+    toJSON: {
+      getters: true,
+    },
+  }
 );
 
-const CommentSchema = new Schema({
+const CommentSchema = new Schema(
+  {
     writtenBy: {
-        type: String
+      type: String,
     },
     commentBody: {
-        type: String
-        },
+      type: String,
+    },
     createdAt: {
-        type: Date,
-        default: Date.now,
-        get: createdAtVal => dateFormat(createdAtVal)
+      type: Date,
+      default: Date.now,
+      get: (createdAtVal) => dateFormat(createdAtVal),
     },
-    //use ReplyScema to validate date for a reply
-    replies: [ReplySchema]
-},
-{
+    // use ReplySchema to validate data for a reply
+    replies: [ReplySchema],
+  },
+  {
     toJSON: {
-        virtuals: true,
-        getters: true
+      virtuals: true,
+      getters: true,
     },
-    id: false
+    id: false,
+  }
+);
+
+CommentSchema.virtual("replyCount").get(function () {
+  return this.replies.length;
 });
 
-// create the Pizza model using the PizzaSchema
-const Comment = model('Comment', CommentSchema);
+const Comment = model("Comment", CommentSchema);
 
-// export the Pizza model
 module.exports = Comment;
